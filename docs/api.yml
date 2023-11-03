@@ -47,6 +47,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Book'
+ #TODO2: complete GET (can be filtered by name) - PUT - DELETE
   /authors:
     get:
       summary: Get authors
@@ -103,7 +104,7 @@ paths:
       responses:
         200:
           description: Author deleted successfully
-  #TODO2: complete GET (can be filtered by name) - PUT - DELETE
+ 
 components:
   schemas:
               #TODO1: set it as a component with properties : id, name, sex (M or F)
