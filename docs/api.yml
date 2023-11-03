@@ -48,9 +48,78 @@ paths:
                 items:
                   $ref: '#/components/schemas/Book'
   /authors:
+    get:
+      summary: Get authors
+      description: Filter authors by name
+      operationId: getAuthors
+      parameters:
+        - in: query
+          name: name
+          description: Filter authors by name
+          required: false
+          schema:
+            type: string
+      responses:
+        200:
+          description: List of authors filtered 
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/author'
+    put:
+      summary: Update authors
+      description: Update a list of authors
+      operationId: UpdateAuthors
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/author'
+      responses:
+        200:
+          description: List of authors updated 
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/author' 
+  /authors/{authorId}:
+    delete:
+      summary: Delete author
+      description: Delete a specific author
+      operationId: deleteAuthor
+      parameters:
+        - in: path
+          name: authorId
+          description: ID of the author to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Author deleted successfully
   #TODO2: complete GET (can be filtered by name) - PUT - DELETE
 components:
   schemas:
+              #TODO1: set it as a component with properties : id, name, sex (M or F)
+    author:
+      type: string
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        sex:
+          type: string
+          enum:
+            - M
+            - F
+  
     Book:
       type: object
       properties:
@@ -58,20 +127,9 @@ components:
           type: string
         bookName:
           type: string
-        
-          #TODO1: set it as a component with properties : id, name, sex (M or F)
         author:
-          type: string
-          properties:
-            id:
-              type: string
-            name:
-              type: string
-            sex:
-              type: string
-              enum:
-                - M
-                - F
+          $ref: '#/components/schemas/author'
+
         pageNumbers:
           type: integer
         topic:
