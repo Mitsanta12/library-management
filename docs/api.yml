@@ -8,8 +8,9 @@ servers:
 paths:
   /books:
     get:
+            #TODO3: add parameter to filter books by intervals of dates of the releaseDate
       summary: Get all books
-      description: The returned books are ordered by updated datetime.
+      description: The returned books ordered by bookName datetime.
       operationId: getBooks
       parameters:
         - in: query
@@ -18,7 +19,13 @@ paths:
           required: false
           schema:
             type: string
-        #TODO3: add parameter to filter books by intervals of dates of the releaseDate
+        - in: query
+          name: startDate
+          description: ReleaseDate
+          required: false
+          schema:
+            type: string
+            format: date
       responses:
         200:
           description: The list of filtered books
@@ -28,6 +35,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Book'
+                  
     put:
       summary: Create or update a list of books
       operationId: crupdateBooks
@@ -120,7 +128,9 @@ components:
           enum:
             - M
             - F
-  
+    releaseDate:
+      type: string
+      format: date
     Book:
       type: object
       properties:
@@ -140,5 +150,5 @@ components:
             - COMEDY
             - OTHER
         releaseDate:
-          type: string
-          format: date
+          $ref: '#/components/schemas/releaseDate'
+
