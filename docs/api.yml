@@ -35,23 +35,28 @@ paths:
             type: string
             format: date
           required: false
-        - $ref: '#/components/parameters/queryPagination'
-        - in: path
-          name: pageSize
-          description: Number of items per page (default is 50)
-          required: false
+        - in: query
+          name: page
           schema:
-            type: integer
-            default: 50
+            $ref: '#/components/parameters/QueryPagination/schema/properties/page'
+        - in: query
+          name: pagesize
+          schema:
+            $ref: '#/components/parameters/QueryPagination/schema/properties/page_size'
       responses:
-        200:
-          description: List of books
+        '200':
+          description: Successful response
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Book'
+                $ref: '#/components/schemas/Book'
+
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
    
     put:
       tags:
@@ -66,7 +71,7 @@ paths:
               items:
                 $ref: '#/components/schemas/Book'
       responses:
-        200:
+        '200':
           description: The list of created or updated books
           content:
             application/json:
@@ -74,6 +79,14 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Book'
+
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+
 
     post:
       tags:
@@ -97,6 +110,45 @@ paths:
                 items:
                   $ref: '#/components/schemas/Book'
 
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+
+
+  /books/import:
+    post:
+      tags:
+        - Books
+      summary: Import books
+      operationId: importBooks
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/BookImport'  # Schéma des livres à importer au format JSON
+      responses:
+        '200':
+          description: List of imported books
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Book'
+
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+
+
   /books/{bookId}/authors/{authorId}:
     put:
       tags:
@@ -119,6 +171,19 @@ paths:
       responses:
         200:
           description: Author of the book updated successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/crupdateBooks'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+
 
   /books/authors:
     put:
@@ -136,7 +201,18 @@ paths:
       responses:
         200:
           description: Book authors updated successfully
-
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UpdateBookAuthor'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
 
 
   /authors:
@@ -147,20 +223,12 @@ paths:
       description: Filter authors by name
       operationId: getAuthors
       parameters:
-        - $ref: '#/components/parameters/queryPagination'
         - in: query
           name: name
           description: Filter authors by name
           required: false
           schema:
             type: string
-        - in: path
-          name: pageSize
-          description: Number of items per page (default is 50)
-          required: true
-          schema:
-            type: integer
-            default: 50
       responses:
         200:
           description: List of authors filtered
@@ -170,7 +238,40 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/author'
-
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+  /authors/import:
+    post:
+          tags:
+            - Authors
+          summary: Import authors
+          operationId: importAuthors
+          requestBody:
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/AuthorImport'
+          responses:
+            '200':
+              description: List of imported authors
+              content:
+                application/json:
+                  schema:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/author' 
+            '400':
+              $ref: '#/components/responses/400'
+            '403':
+              $ref: '#/components/responses/403'
+            '500':
+              $ref: '#/components/responses/500'
     put:
       tags:
        - Authors    
@@ -193,6 +294,52 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/author' 
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+
+  /authors/page/{page}/pagesize/{pagesize}:
+     get:
+      summary: Get author by name
+      description: Get list of authors filtered.
+      operationId: getByNameAuth
+      tags:
+        - Authors
+      parameters:
+        - name: page 
+          in: path  
+          schema:
+            $ref: '#/components/parameters/QueryPagination/schema/properties/page'
+          required: true
+        - name: pagesize
+          in: path
+          schema:
+            $ref: '#/components/parameters/QueryPagination/schema/properties/page_size'
+          required: true
+        - in: query
+          name: name
+          description: Name of authors filtered
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The list of books filtered 
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/author'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
   /authors/{authorId}:
     delete:
       tags:
@@ -214,24 +361,66 @@ paths:
 
 components:
   parameters:
-    queryPagination:
-      name: page
+    QueryPagination:
+      name: queryPagination
       in: query
-      description: Page number for pagination
+      description: Paramètres de pagination.
       required: false
       schema:
-        type: integer
-        default: 1
+        type: object
+        properties:
+          page:
+            type: integer
+            default: 1
+            description: Le numéro de page.
+          page_size:
+            type: integer
+            default: 50
+            description: Le nombre d'éléments par page
 
-    pathPagination:
-      name: page
+    
+    PathPagination:
+      name: queryPagination
       in: path
-      description: Page number for pagination
+      description: pagination parametters.
       required: true
       schema:
-        type: integer
-        default: 1
+        type: object
+        properties:
+          page:
+            type: integer
+            default: 1
+            description: page number.
+          page_size:
+            type: integer
+            default: 50
+            description: Page size
 
+  responses:
+    '200':
+      description: successfully
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseSuccefully'
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BadRequestException'
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotAuthorizedException'
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerException'
   schemas:
     Book:
       type: object
@@ -240,8 +429,6 @@ components:
           $ref: '#/components/schemas/author'
       allOf:
         - $ref: '#/components/schemas/crupdateBooks'
-     
-    
     author:
       type: object
       properties:
@@ -271,14 +458,13 @@ components:
     crupdateBooks: 
       type: object
       properties:
-        id:
-          type: string
         bookName:
           type: string
         topic:
-          $ref: '#/components/schemas/Topic'
+            $ref: '#/components/schemas/Topic'
+        
         pageNumbers:
-          $ref: '#/components/schemas/PageSize'
+          $ref: '#/components/parameters/QueryPagination'
         releaseDate:
           type: string
           format: date
@@ -289,3 +475,57 @@ components:
           type: string
         authorId:
           type: string
+    BookImport:
+      type: object
+      properties:
+        bookName:
+          type: string
+        author:
+          $ref: '#/components/schemas/author'  
+        pageNumbers:
+          $ref: '#/components/schemas/PageSize'
+        topic:
+          $ref: '#/components/schemas/Topic'
+        releaseDate:
+          type: string
+          format: date
+        idAuthor:
+          type: string
+    AuthorImport:
+      type: object
+      properties:
+        authorName:
+          type: string
+        sex:
+          $ref: '#/components/schemas/Sex'
+    Exception:
+      type: object
+      properties:
+        type:
+          type: string
+        message:
+          type: string
+    ResponseSuccefully:
+      allOf:
+        - $ref: '#/components/schemas/Exception'
+      example:
+        type: ResponseSuccefully
+        message: Response  successfully
+    BadRequestException:
+      allOf:
+        - $ref: '#/components/schemas/Exception'
+      example:
+        type: BadRequestException
+        message: Bad request
+    NotAuthorizedException:
+      allOf:
+        - $ref: '#/components/schemas/Exception'
+      example:
+        type: NotAuthorizedException
+        message: Not authorized
+    InternalServerException:
+      allOf:
+        - $ref: '#/components/schemas/Exception'
+      example:
+        type: InternalServerException
+        message: Unexpected error
