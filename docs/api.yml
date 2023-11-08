@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Library API
-  version: 1.1.0
+  version: 1.2.0
   description: STD21071
 servers:
   - url: https://library.com
@@ -221,7 +221,27 @@ paths:
         200:
           description: Author deleted successfully
 
+
 components:
+  parameters:
+    queryPagination:
+      name: page
+      in: query
+      description: Page number for pagination (default is 1)
+      required: false
+      schema:
+        type: integer
+        default: 1
+
+    pathPagination:
+      name: page
+      in: path
+      description: Page number for pagination (default is 1)
+      required: true
+      schema:
+        type: integer
+        default: 1
+
   schemas:
     Book:
       type: object
@@ -240,18 +260,18 @@ components:
         name: 
           type: string
         sex:
-         $ref: '#/components/schemas/Sex'
+          $ref: '#/components/schemas/Sex'
     Sex:
-        type: string
-        enum:
-            - M
-            - F  
+      type: string
+      enum:
+        - M
+        - F  
     Topic:
-        type: string
-        enum:
-            - ROMANCE
-            - COMEDY
-            - OTHER
+      type: string
+      enum:
+        - ROMANCE
+        - COMEDY
+        - OTHER
     Page:
       type: integer
       description: Start at `1`
@@ -266,8 +286,7 @@ components:
         bookName:
           type: string
         topic:
-            $ref: '#/components/schemas/Topic'
-        
+          $ref: '#/components/schemas/Topic'
         pageNumbers:
           $ref: '#/components/schemas/PageSize'
         releaseDate:
@@ -280,8 +299,3 @@ components:
           type: string
         authorId:
           type: string
-
-        
-
-
-
