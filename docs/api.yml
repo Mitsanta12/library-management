@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Library API
-  version: 1.2.0
+  version: 2.0.0
   description: STD21071
 servers:
   - url: https://library.com
@@ -17,6 +17,8 @@ paths:
       summary: Get all books
       description: Returned all books are ordered by updated datetime.
       operationId: getBooks
+      security:
+        - OAuth2: ['VISITOR','ADMINISTRATOR']
       parameters:
         - in: query
           name: bookName
@@ -63,6 +65,8 @@ paths:
        - Books
       summary: Create or update a list of books
       operationId: crupdateBooks
+      security:
+        - OAuth2: ['ADMINISTRATOR']
       requestBody:
         content:
           application/json:
@@ -93,6 +97,8 @@ paths:
         - Books
       summary: Create or update a list of books
       operationId: crupdateBooks
+      security:
+         - OAuth2: ['ADMINISTRATOR']
       requestBody:
         content:
           application/json:
@@ -124,13 +130,16 @@ paths:
         - Books
       summary: Import books
       operationId: importBooks
+      security:
+        - OAuth2: ['ADMINISTRATOR']
       requestBody:
         content:
           application/json:
+            schema:              
+                $ref: '#/components/schemas/ImportBookJson'
+          application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
             schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/BookImport'  # Schéma des livres à importer au format JSON
+                $ref: '#/components/schemas/ImportBookExel'
       responses:
         '200':
           description: List of imported books
@@ -155,6 +164,8 @@ paths:
         - Books
       summary: Update author of a book
       operationId: updateBookAuthor
+      security:
+        - OAuth2: ['ADMINISTRATOR']
       parameters:
         - in: path
           name: bookId
@@ -191,6 +202,8 @@ paths:
         - Books
       summary: Update book authors
       operationId: updateBookAuthors
+      security:
+        - OAuth2: ['ADMINISTRATOR']
       requestBody:
         content:
           application/json:
@@ -218,6 +231,8 @@ paths:
       tags:
         - Books
       summary: List of books on loan
+      security:
+        - OAuth2: ['ADMINISTRATOR']
       responses:
         200:
           description: List of books on loan
@@ -238,6 +253,8 @@ paths:
       tags:
         - Books
       summary: List of available books
+      security:
+        - OAuth2: ['ADMINISTRATOR']
       responses:
         200:
           description: List of available books
@@ -261,6 +278,8 @@ paths:
       summary: Get authors
       description: Filter authors by name
       operationId: getAuthors
+      security:
+        - OAuth2: ['VISITOR','ADMINISTRATOR']
       parameters:
         - in: query
           name: name
@@ -289,13 +308,16 @@ paths:
             - Authors
           summary: Import authors
           operationId: importAuthors
+          security:
+            - OAuth2: ['ADMINISTRATOR']
           requestBody:
             content:
               application/json:
                 schema:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/AuthorImport'
+                  $ref: '#/components/schemas/ImportAuthorJson'
+              application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+                schema:
+                  $ref: '#/components/schemas/ImportAuthorExel'
           responses:
             '200':
               description: List of imported authors
@@ -314,6 +336,9 @@ paths:
     put:
       tags:
        - Authors    
+
+      security:
+         - OAuth2: ['ADMINISTRATOR']
       summary: Update authors
       description: Update a list of authors
       operationId: UpdateAuthors
@@ -347,6 +372,8 @@ paths:
       operationId: getByNameAuth
       tags:
         - Authors
+      security:
+         - OAuth2: ['VISITOR','ADMINISTRATOR']
       parameters:
         - name: page 
           in: path  
@@ -386,6 +413,8 @@ paths:
       summary: Delete author
       description: Delete a specific author
       operationId: deleteAuthor
+      security:
+         - OAuth2: ['ADMINISTRATOR']
       parameters:
         - in: path
           name: authorId
@@ -403,6 +432,8 @@ paths:
        - Visitors
       summary: Get all visitors
       operationId: getAllVisitors
+      security:
+         - OAuth2: ['VISITOR','ADMINISTRATOR']
       responses:
         '200':
           description: List of all visitors
@@ -425,6 +456,8 @@ paths:
         - "Visitors"
       summary: Get a visitor by ID
       operationId: getVisitorById
+      security:
+         - OAuth2: ['VISITOR','ADMINISTRATOR']
       parameters:
         - in: path
           name: visitorId
@@ -457,6 +490,8 @@ paths:
       tags:
        - Visitors
       summary: Visitor activities
+      security:
+         - OAuth2: ['VISITOR','ADMINISTRATOR']
       parameters:
         - in: path
           name: visitorId
@@ -500,6 +535,8 @@ paths:
           - Visitors
         summary: Visitor borrows a book
         operationId: borrowBook
+        security:
+         - OAuth2: ['ADMINISTRATOR']
         parameters:
           - in: path
             name: visitorId
@@ -539,6 +576,8 @@ paths:
         - Visitors
       summary: Visitor returns a book
       operationId: returnBook
+      security:
+         - OAuth2: ['ADMINISTRATOR']
       parameters:
         - in: path
           name: visitorId
@@ -640,6 +679,15 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/InternalServerException'
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://example.com/oauth/authorize
+          scopes:
+            VISITOR: Visitor access
+            ADMINISTRATOR: Administrator Access
   schemas:
     Book:
       type: object
@@ -691,7 +739,26 @@ components:
         borrowing date:
           type: string
           format: date
-
+    ImportAuthor:
+         oneOf: 
+          - $ref: '#/components/schemas/ImportAuthorExel'
+          - $ref: '#/components/schemas/ImportAuthorJson'
+    ImportBook:
+        type: object
+        properties:
+          idAuthor:
+            type: integer
+        oneOf: 
+          - $ref: '#/components/schemas/ImportBookExel'
+          - $ref: '#/components/schemas/ImportBookJson'
+    ImportBookExel:
+        $ref: '#/components/schemas/Book'
+    ImportBookJson:
+        $ref: '#/components/schemas/Book'
+    ImportAuthorExel:
+        $ref: '#/components/schemas/author'
+    ImportAuthorJson:
+        $ref: '#/components/schemas/author'
     ReturnRequest:
       type: object
       properties:
