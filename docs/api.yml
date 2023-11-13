@@ -48,12 +48,7 @@ paths:
             $ref: '#/components/parameters/QueryPagination/schema/properties/page_size'
       responses:
         '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Book'
-
+          $ref: '#/components/responses/BookList_200'
         '400':
           $ref: '#/components/responses/400'
         '403':
@@ -107,23 +102,14 @@ paths:
               items:
                 $ref: '#/components/schemas/Book'
       responses:
-        200:
-          description: The list of created or updated books
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Book'
-
+        '200':
+          $ref: '#/components/responses/BookList_200'
         '400':
           $ref: '#/components/responses/400'
         '403':
           $ref: '#/components/responses/403'
         '500':
           $ref: '#/components/responses/500'
-
-
   /books/import:
     post:
       tags:
@@ -149,15 +135,12 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Book'
-
         '400':
           $ref: '#/components/responses/400'
         '403':
           $ref: '#/components/responses/403'
         '500':
           $ref: '#/components/responses/500'
-
-
   /books/{bookId}/authors/{authorId}:
     put:
       tags:
@@ -194,8 +177,6 @@ paths:
           $ref: '#/components/responses/403'
         '500':
           $ref: '#/components/responses/500'
-
-
   /books/authors:
     put:
       tags:
@@ -288,14 +269,8 @@ paths:
           schema:
             type: string
       responses:
-        200:
-          description: List of authors filtered
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/author'
+        '200':
+          $ref: '#/components/responses/AuthorList_200'
         '400':
           $ref: '#/components/responses/400'
         '403':
@@ -364,7 +339,6 @@ paths:
           $ref: '#/components/responses/403'
         '500':
           $ref: '#/components/responses/500'
-
   /authors/page/{page}/pagesize/{pagesize}:
      get:
       summary: Get author by name
@@ -426,6 +400,7 @@ paths:
         200:
           description: Author deleted successfully
 
+
   /visitors:
     get:
       tags:
@@ -449,7 +424,6 @@ paths:
           $ref: '#/components/responses/403'
         '500':
           $ref: '#/components/responses/500'
-
   /visitors/{visitorId}:
     get:
       tags:
@@ -476,15 +450,8 @@ paths:
           $ref: '#/components/responses/400'
         '403':
           $ref: '#/components/responses/403'
-        '404':
-          description: Visitor not found
-          content:
-            application/json:
-              schema:
-                 $ref: '#/components/responses/404'
         '500':
           $ref: '#/components/responses/500'
-
   /visitors/{visitorId}/actions:
     get:
       tags:
@@ -524,9 +491,6 @@ paths:
           $ref: '#/components/responses/400'
         '403':
           $ref: '#/components/responses/403'
-        '404':
-          description:
-          $ref: '#/components/responses/404'
         '500':
           $ref: '#/components/responses/500'               
   /visitors/{visitorId}/borrow/{bookId}:
@@ -555,8 +519,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BorrowRequest' # Schéma des détails de l'emprunt
-
+                $ref: '#/components/schemas/BorrowRequest'
         responses:
           '200':
             description: Book borrowed successfully
@@ -564,12 +527,8 @@ paths:
             $ref: '#/components/responses/400'
           '403':
             $ref: '#/components/responses/403'
-          '404':
-            description:
-            $ref: '#/components/responses/404'
           '500':
             $ref: '#/components/responses/500' 
-
   /visitors/{visitorId}/return/{bookId}:
     post:
       tags:
@@ -596,8 +555,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ReturnRequest' # Schéma des détails du retour
-
+              $ref: '#/components/schemas/ReturnRequest' 
       responses:
         '200':
           description: Book returned successfully
@@ -605,11 +563,9 @@ paths:
           $ref: '#/components/responses/400'
         '403':
           $ref: '#/components/responses/403'
-        '404':
-          description:
-          $ref: '#/components/responses/404'
         '500':
           $ref: '#/components/responses/500' 
+
 
 components:
   parameters:
@@ -629,8 +585,6 @@ components:
             type: integer
             default: 50
             description: Le nombre d'éléments par page
-
-    
     PathPagination:
       name: queryPagination
       in: path
@@ -647,38 +601,6 @@ components:
             type: integer
             default: 50
             description: Page size
-
-  responses:
-    '200':
-      description: successfully
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ResponseSuccefully'
-    '400':
-      description: Bad request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/BadRequestException'
-    '403':
-      description: Forbidden
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/NotAuthorizedException'
-    '404':
-      description: Not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/NotAuthorizedException'
-    '500':
-      description: Internal server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/InternalServerException'
   securitySchemes:
     OAuth2:
       type: oauth2
@@ -688,7 +610,94 @@ components:
           scopes:
             VISITOR: Visitor access
             ADMINISTRATOR: Administrator Access
+  responses:
+    AuthorList_200:
+      description: Authors lists
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/authorListBody'
+    BookList_200:
+      description: Books lists
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BookListBody'
+    400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BadRequestBody'
+    403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ForbiddenBody'  
+    500:
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ForbiddenBody'  
   schemas:
+    ResponseStatus:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: OK
+    ResponseBodyTemplate:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/ResponseStatus'
+        body:
+          type: object
+    BadRequestBody:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBodyTemplate'
+      example:
+        status:
+          code: 400
+          message: BAD REQUEST
+        body: { }
+    ForbiddenBody:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBodyTemplate'
+      example:
+        status:
+          code: 403
+          message: FORBIDDEN
+        body: { }
+    InternationalServerError:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBodyTemplate'
+      example:
+        status:
+          code: 500
+          message: SERVER ERROR
+        body: { }
+    BookListBody:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBodyTemplate'
+        - properties:
+            body:
+              type: array
+              items:
+                $ref: '#/components/schemas/Book'
+    authorListBody:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBodyTemplate'
+        - properties:
+            body:
+              type: array
+              items:
+                $ref: '#/components/schemas/author'
     Book:
       type: object
       properties:
@@ -829,34 +838,4 @@ components:
           type: string
         sex:
           $ref: '#/components/schemas/Sex'
-    Exception:
-      type: object
-      properties:
-        type:
-          type: string
-        message:
-          type: string
-    ResponseSuccefully:
-      allOf:
-        - $ref: '#/components/schemas/Exception'
-      example:
-        type: ResponseSuccefully
-        message: Response  successfully
-    BadRequestException:
-      allOf:
-        - $ref: '#/components/schemas/Exception'
-      example:
-        type: BadRequestException
-        message: Bad request
-    NotAuthorizedException:
-      allOf:
-        - $ref: '#/components/schemas/Exception'
-      example:
-        type: NotAuthorizedException
-        message: Not authorized
-    InternalServerException:
-      allOf:
-        - $ref: '#/components/schemas/Exception'
-      example:
-        type: InternalServerException
-        message: Unexpected error
+ 
