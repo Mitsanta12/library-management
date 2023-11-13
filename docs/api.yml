@@ -387,6 +387,12 @@ components:
             description: Page size
 
   responses:
+    AuthorList:
+      description: Authors lists
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/authorListBody'
     BookList_200:
       description: Books lists
       content:
@@ -460,6 +466,14 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/Book'
+    authorListBody:
+      allOf:
+        - $ref: '#/components/schemas/ResponseBodyTemplate'
+        - properties:
+            body:
+              type: array
+              items:
+                $ref: '#/components/schemas/author'
     Book:
       type: object
       properties:
